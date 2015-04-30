@@ -1,5 +1,5 @@
-[Default]
-api_key = 
+[Config]
+api_key =
 download_dir = downloads
 download_temp = temp
 torrent_dir = torrents
@@ -7,4 +7,3 @@ delete_stopped_and_complete = False
 external_script = 
 use_aria = False
 aria_executable = aria2c
-
