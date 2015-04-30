@@ -43,10 +43,12 @@ try:
 except:
     import urllib2
 from subprocess import call
-from urllib.error import HTTPError
-from urllib.request import Request, urlopen, urlretrieve
 import urllib
-import configparser
+
+try:
+    import ConfigParser as configparser
+except:
+    import configparser
 
 #linux touch file to update edit time
 def touch(fname, times=None):
@@ -56,8 +58,11 @@ def touch(fname, times=None):
 #Opens a url and parses XML. Will retry with sleeps in between
 def getURLX(URL,data,retries=3,wait_time=1000):
     for i in range(0,retries):
-        req = urllib.request.Request(URL,urllib.parse.urlencode(data).encode('utf-8'))
-        x = xml.dom.minidom.parse(urllib.request.urlopen(req))
+        if sys.version() < 3:
+            req = urllib2.Request(URL,urllib.urlencode(data).encode('utf-8'))
+        else:
+            req = urllib.request.Request(URL,urllib.parse.urlencode(data).encode('utf-8'))
+        x = xml.dom.minidom.parse(urllib2.urlopen(req))
         status = x.getElementsByTagName("status")[0]
         if status and status.firstChild.data=="SUCCESS":
             return x
