@@ -58,7 +58,7 @@ def touch(fname, times=None):
 #Opens a url and parses XML. Will retry with sleeps in between
 def getURLX(URL,data,retries=3,wait_time=1000):
     for i in range(0,retries):
-        if sys.version() < '3':
+        if sys.version < '3':
             req = urllib2.Request(URL,urllib.urlencode(data).encode('utf-8'))
         else:
             req = urllib.request.Request(URL,urllib.parse.urlencode(data).encode('utf-8'))
