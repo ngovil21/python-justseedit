@@ -197,20 +197,20 @@ def uploadTorrent(file_path,label=""):
 config = configparser.ConfigParser()
 CONFIG_FILE = os.path.join(os.path.expanduser("~"),".jsit-blackhole")
 if not(os.path.isfile(CONFIG_FILE)):
-    CONFIG_FILE = ".jsit-blackhole"
+    CONFIG_FILE = "Settings.cfg"
 if not(os.path.isfile(CONFIG_FILE)):
     #Create Config file here
     print("No config file found! Creating one")
-    config.add_section('Defaults')
-    config.set('Defaults','api_key',"")
-    config.set('Defaults','download_dir',"downloads")
-    config.set('Defaults','download_temp',"temp")
-    config.set('Defaults','torrent_dir',"torrents")
-    config.set('Defaults','delete_stopped_and_complete',False)
-    config.set('Defaults','external_script',"")
-    config.set('Defaults','use_aria',True)
-    config.set('Defaults','aria_executable'"aria2c")
-    with open('.jsit-blackhole', 'w') as configfile:
+    config.add_section('Default')
+    config.set('Default','api_key',"")
+    config.set('Default','download_dir',"downloads")
+    config.set('Default','download_temp',"temp")
+    config.set('Default','torrent_dir',"torrents")
+    config.set('Default','delete_stopped_and_complete',"False")
+    config.set('Default','external_script',"")
+    config.set('Default','use_aria',"False")
+    config.set('Default','aria_executable',"aria2c")
+    with open(CONFIG_FILE, 'w') as configfile:
         config.write(configfile)
     exit()
 else:
@@ -221,12 +221,12 @@ else:
         print("No API key provided! Please put an api key in the config file and try again!")
         exit()
     download_dir = config.get('Default','download_dir','downloads')
-    download_temp = config.get('Defaults','download_temp','temp')
-    torrent_dir = config.get('Defaults','torrent_dir','torrents')
-    delete_stopped_and_complete = config.getboolean('Defaults','delete_stopped_and_complete')
-    external_script = config.get('Defaults','external_script')
-    use_aria = config.getboolean('Defaults','use_aria')
-    aria_executable = config.get('Defaults','aria_executable','aria2c')
+    download_temp = config.get('Default','download_temp','temp')
+    torrent_dir = config.get('Default','torrent_dir','torrents')
+    delete_stopped_and_complete = config.getboolean('Default','delete_stopped_and_complete')
+    external_script = config.get('Default','external_script')
+    use_aria = config.getboolean('Default','use_aria')
+    aria_executable = config.get('Default','aria_executable','aria2c')
 
 #if not (os.path.isdir(download_dir)):
 #    os.makedirs(download_dir)
