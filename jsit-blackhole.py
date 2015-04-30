@@ -74,13 +74,13 @@ def getFirstData(xml, tag):
 
 #Not used, showed download progress
 def urlProgress(blocks, blockSize, totalSize):
-  try:
-    if sys.version() < '3':
-      print("%dMB/%dMB  Rate=%.1fMB/s ---- %2.1f%%        \r " % ((blocks*blockSize)/(1024*1024),(totalSize)/(1024*1024),float(blocks*blockSize)/(1024*1024*(time.time()-time_start)),(float(blocks*blockSize)/float(totalSize))*100)),
-    else:
-      print("%dMB/%dMB  Rate=%.1fMB/s ---- %2.1f%%         " % ((blocks*blockSize)/(1024*1024),(totalSize)/(1024*1024),float(blocks*blockSize)/(1024*1024*(time.time()-time_start)),(float(blocks*blockSize)/float(totalSize))*100),end="\r")
-  except:
-    return
+  # try:
+  #   if sys.version() < '3':
+  #     print("%dMB/%dMB  Rate=%.1fMB/s ---- %2.1f%%        \r " % ((blocks*blockSize)/(1024*1024),(totalSize)/(1024*1024),float(blocks*blockSize)/(1024*1024*(time.time()-time_start)),(float(blocks*blockSize)/float(totalSize))*100)),
+  #   else:
+  #     print("%dMB/%dMB  Rate=%.1fMB/s ---- %2.1f%%         " % ((blocks*blockSize)/(1024*1024),(totalSize)/(1024*1024),float(blocks*blockSize)/(1024*1024*(time.time()-time_start)),(float(blocks*blockSize)/float(totalSize))*100),end="\r")
+  # except:
+      return
 
 time_start=0
 #Download Completed Torrents from justseed.it
