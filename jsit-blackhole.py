@@ -42,11 +42,11 @@ try:
     import urllib.request as urllib2
 except:
     import urllib2
-
 from subprocess import call
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen, urlretrieve
 import urllib
+import configparser
 
 #linux touch file to update edit time
 def touch(fname, times=None):
@@ -189,6 +189,38 @@ def uploadTorrent(file_path,label=""):
         getURLX(API_URL + "/torrent/start.csp", {"api_key":api_key,"info_hash":info_hash})
 
 
+config = configparser.ConfigParser()
+CONFIG_FILE = os.path.join(os.path.expanduser("~"),".jsit-blackhole")
+if not(os.path.isfile(CONFIG_FILE)):
+    CONFIG_FILE = ".jsit-blackhole"
+if not(os.path.isfile(CONFIG_FILE)):
+    #Create Config file here
+    print("No config file found! Creating one")
+    config['Default'] = {'api_key' : "",
+                         'download_dir' : "downloads",
+                         'download_temp' : "temp",
+                         'torrent_dir' : "torrents",
+                         'delete_stopped_and_complete' : False,
+                         'external_script' : "",
+                         'use_aria' : True,
+                         'aria_executable' : "aria2c"
+                        }
+    with open('.jsit-blackhole', 'w') as configfile:
+        config.write(configfile)
+else:
+    print("Loading settings from: " + CONFIG_FILE)
+    config.read(CONFIG_FILE)
+    api_key = config['Default'].get('api_key')
+    if not api_key:
+        print("No API key provided! Please put an api key in the config file and try again!")
+        exit()
+    download_dir = config['Default'].get('download_dir','downloads')
+    download_temp = config['Default'].get('download_temp','temp')
+    torrent_dir = config['Default'].get('torrent_dir','torrents')
+    delete_stopped_and_complete = config['Default'].getboolean('delete_stopped_and_complete',False)
+    external_script = config['Default'].get('external_script')
+    use_aria = config['Default'].getboolean('use_aria',False)
+    aria_executable = config['Default'].get('aria_executable','aria2c')
 
 #if not (os.path.isdir(download_dir)):
 #    os.makedirs(download_dir)
