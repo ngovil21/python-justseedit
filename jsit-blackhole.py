@@ -201,6 +201,7 @@ if not(os.path.isfile(CONFIG_FILE)):
 if not(os.path.isfile(CONFIG_FILE)):
     #Create Config file here
     print("No config file found! Creating one")
+    config.add_section('Defaults')
     config.set('Defaults','api_key',"")
     config.set('Defaults','download_dir',"downloads")
     config.set('Defaults','download_temp',"temp")
