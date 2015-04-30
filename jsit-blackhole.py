@@ -15,7 +15,7 @@ api_key = ""
 download_dir = "downloads"
 #directory to store incomplete downloads in
 download_temp = "temp"
-#directory which will be monitored for
+#directory which will be monitored for, subfolders will specify the torrent label
 torrent_dir = "torrents"
 
 # Clear complete and stopped torrents from justseed.it?
@@ -48,12 +48,12 @@ from urllib.error import HTTPError
 from urllib.request import Request, urlopen, urlretrieve
 import urllib
 
-
+#linux touch file to update edit time
 def touch(fname, times=None):
     with open(fname, 'a'):
         os.utime(fname, times)
 
-
+#Opens a url and parses XML. Will retry with sleeps in between
 def getURLX(URL,data,retries=3,wait_time=1000):
     for i in range(0,retries):
         req = urllib.request.Request(URL,urllib.parse.urlencode(data).encode('utf-8'))
@@ -65,12 +65,14 @@ def getURLX(URL,data,retries=3,wait_time=1000):
         time.sleep(wait_time)
     return None
 
+#Gets the first element of the first tag that matches
 def getFirstData(xml, tag):
     element = xml.getElementsByTagName(tag)[0]
     if element and element.hasChildNodes():
        return element.firstChild.data
     return ""
 
+#Not used, showed download progress
 def urlProgress(blocks, blockSize, totalSize):
   try:
     if sys.version() < '3':
@@ -81,6 +83,7 @@ def urlProgress(blocks, blockSize, totalSize):
     return
 
 time_start=0
+#Download Completed Torrents from justseed.it
 def downloadTorrentFiles():
     global time_start
     print("Downloading")
@@ -134,6 +137,7 @@ def downloadTorrentFiles():
                                 if external_script:
                                     call(["python",external_script,download_path])
 
+#Delete completed and stopped torrents from justseed.it list
 def cleanUpTorrents():
     print("Cleaning Up")
     torrent_list = getURLX(API_URL + "/torrents/list.csp",{"api_key":api_key})
@@ -147,7 +151,7 @@ def cleanUpTorrents():
                     if (getFirstData(torrent_data,"status") == "stopped"):
                         getURLX(API_URL + "/torrent/delete.csp",{"api_key":api_key,"info_hash":info_hash})
 
-
+# Upload torrents from monitored directory to justseed.it, subfolder name will be the label.
 def uploadTorrents():
     print("Uploading")
     for file in os.listdir(torrent_dir):
