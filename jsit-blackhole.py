@@ -193,47 +193,50 @@ def uploadTorrent(file_path,label=""):
             getURLX(API_URL + "/torrent/set_label.csp", {"api_key":api_key,"info_hash":info_hash,"label":label})
         getURLX(API_URL + "/torrent/start.csp", {"api_key":api_key,"info_hash":info_hash})
 
-
-config = configparser.ConfigParser()
-CONFIG_FILE = os.path.join(os.path.expanduser("~"),".jsit-blackhole")
-if not(os.path.isfile(CONFIG_FILE)):
-    CONFIG_FILE = "Settings.cfg"
-if not(os.path.isfile(CONFIG_FILE)):
-    #Create Config file here
-    print("No config file found! Creating one")
-    config.add_section('Config')
-    config.set('Config','api_key',"")
-    config.set('Config','download_dir',"downloads")
-    config.set('Config','download_temp',"temp")
-    config.set('Config','torrent_dir',"torrents")
-    config.set('Config','delete_stopped_and_complete',"False")
-    config.set('Config','external_script',"")
-    config.set('Config','use_aria',"False")
-    config.set('Config','aria_executable',"aria2c")
-    with open(CONFIG_FILE, 'w') as configfile:
-        config.write(configfile)
-    exit()
-else:
-    print("Loading settings from: " + CONFIG_FILE)
-    config.read(CONFIG_FILE)
-    api_key = config.get('Config','api_key')
-    if not api_key:
-        print("No API key provided! Please put an api key in the config file and try again!")
+#Load Settings from a Config File
+def loadSettings()
+    config = configparser.ConfigParser()
+    CONFIG_FILE = os.path.join(os.path.expanduser("~"),".jsit-blackhole")
+    if not(os.path.isfile(CONFIG_FILE)):
+        CONFIG_FILE = "Settings.cfg"
+    if not(os.path.isfile(CONFIG_FILE)):
+        #Create Config file here
+        print("No config file found! Creating one")
+        config.add_section('Config')
+        config.set('Config','api_key',"")
+        config.set('Config','download_dir',"downloads")
+        config.set('Config','download_temp',"temp")
+        config.set('Config','torrent_dir',"torrents")
+        config.set('Config','delete_stopped_and_complete',"False")
+        config.set('Config','external_script',"")
+        config.set('Config','use_aria',"False")
+        config.set('Config','aria_executable',"aria2c")
+        with open(CONFIG_FILE, 'w') as configfile:
+            config.write(configfile)
         exit()
-    download_dir = config.get('Config','download_dir')
-    if not download_dir: download_dir = 'downloads'
-    download_temp = config.get('Config','download_temp')
-    if not download_temp: download_temp = 'temp'
-    torrent_dir = config.get('Config','torrent_dir')
-    if not torrent_dir: torrent_dir = 'torrents'
-    delete_stopped_and_complete = config.getboolean('Config','delete_stopped_and_complete')
-    external_script = config.get('Config','external_script')
-    use_aria = config.getboolean('Config','use_aria')
-    aria_executable = config.get('Config','aria_executable')
-    if not aria_executable: aria_executable = "aria2c"
+    else:
+        print("Loading settings from: " + CONFIG_FILE)
+        config.read(CONFIG_FILE)
+        api_key = config.get('Config','api_key')
+        if not api_key:
+            print("No API key provided! Please put an api key in the config file and try again!")
+            exit()
+        download_dir = config.get('Config','download_dir')
+        if not download_dir: download_dir = 'downloads'
+        download_temp = config.get('Config','download_temp')
+        if not download_temp: download_temp = 'temp'
+        torrent_dir = config.get('Config','torrent_dir')
+        if not torrent_dir: torrent_dir = 'torrents'
+        delete_stopped_and_complete = config.getboolean('Config','delete_stopped_and_complete')
+        external_script = config.get('Config','external_script')
+        use_aria = config.getboolean('Config','use_aria')
+        aria_executable = config.get('Config','aria_executable')
+        if not aria_executable: aria_executable = "aria2c"
 
-#if not (os.path.isdir(download_dir)):
-#    os.makedirs(download_dir)
+## Main Script #####################################################################################
+
+loadSettings()
+#Create temp and torrent directory
 if not (os.path.isdir(download_temp)):
     os.makedirs(download_temp)
 if not (os.path.isdir(torrent_dir)):
