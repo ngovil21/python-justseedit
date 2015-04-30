@@ -1,17 +1,34 @@
 #!/bin/python3
 
+#####################################################################################################
+# jsit-blackhole is a script that will act as a blackhole torrent downloader for apps like Sonarr, Couchpotato and SickRage
+# It will monitor a directory for torrent files, download completed torrents from justseed.it and moves the files to a completed
+# download folder for another media manager to monitor. It will also use aria2 to download multiple segments to increase download
+# speeds. Run as a cron script.
+####################################################################################################
+
+## OPTIONS ######################################################################
+#API key assigned by justseed.it
 api_key = ""
 
-download_dir = "torrents"
-download_temp = "incomplete"
+#download directory to store completed download, [label] will be replaced with the label from justseed.it
+download_dir = "downloads"
+#directory to store incomplete downloads in
+download_temp = "temp"
+#directory which will be monitored for
 torrent_dir = "torrents"
 
+# Clear complete and stopped torrents from justseed.it?
 delete_stopped_and_complete = True
 
-#external_script = ""
+#Runs an external script on the file after download with the download path to the file
+external_script = ""
 
 use_aria = True
 aria_executable = "aria2c"
+
+## END OPTIONS ###################################################################
+
 
 API_URL = "https://api.justseed.it"
 
@@ -114,7 +131,8 @@ def downloadTorrentFiles():
                                         print("Error moving file!")
                                 else:
                                     print("Error creating directory!")
-                                #call(["python",external_script,download_path])
+                                if external_script:
+                                    call(["python",external_script,download_path])
 
 def cleanUpTorrents():
     print("Cleaning Up")
@@ -128,7 +146,7 @@ def cleanUpTorrents():
                     torrent_data = torrent_info.getElementsByTagName("data")[0]
                     if (getFirstData(torrent_data,"status") == "stopped"):
                         getURLX(API_URL + "/torrent/delete.csp",{"api_key":api_key,"info_hash":info_hash})
- 
+
 
 def uploadTorrents():
     print("Uploading")
@@ -165,7 +183,7 @@ def uploadTorrent(file_path,label=""):
         if label:
             getURLX(API_URL + "/torrent/set_label.csp", {"api_key":api_key,"info_hash":info_hash,"label":label})
         getURLX(API_URL + "/torrent/start.csp", {"api_key":api_key,"info_hash":info_hash})
-                                    
+
 
 
 #if not (os.path.isdir(download_dir)):
