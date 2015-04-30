@@ -207,6 +207,7 @@ if not(os.path.isfile(CONFIG_FILE)):
                         }
     with open('.jsit-blackhole', 'w') as configfile:
         config.write(configfile)
+    exit()
 else:
     print("Loading settings from: " + CONFIG_FILE)
     config.read(CONFIG_FILE)
