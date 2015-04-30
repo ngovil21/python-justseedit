@@ -220,13 +220,17 @@ else:
     if not api_key:
         print("No API key provided! Please put an api key in the config file and try again!")
         exit()
-    download_dir = config.get('Config','download_dir',fallback='downloads')
-    download_temp = config.get('Config','download_temp',fallback='temp')
-    torrent_dir = config.get('Config','torrent_dir',fallback='torrents')
+    download_dir = config.get('Config','download_dir')
+    if not download_dir: download_dir = 'downloads'
+    download_temp = config.get('Config','download_temp')
+    if not download_temp: download_temp = 'temp'
+    torrent_dir = config.get('Config','torrent_dir')
+    if not torrent_dir: torrent_dir = 'torrents'
     delete_stopped_and_complete = config.getboolean('Config','delete_stopped_and_complete')
     external_script = config.get('Config','external_script')
     use_aria = config.getboolean('Config','use_aria')
-    aria_executable = config.get('Config','aria_executable',fallback='aria2c')
+    aria_executable = config.get('Config','aria_executable')
+    if not aria_executable: aria_executable = "aria2c"
 
 #if not (os.path.isdir(download_dir)):
 #    os.makedirs(download_dir)
