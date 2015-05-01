@@ -59,9 +59,9 @@ def touch(fname, times=None):
 def getURLX(URL,data,retries=3,wait_time=1000):
     for i in range(0,retries):
         if sys.version < '3':
-            req = urllib2.Request(URL,urllib.urlencode(data).encode('utf-8'))
+            req = urllib2.Request(URL, urllib.urlencode(data).encode('utf-8'))
         else:
-            req = urllib.request.Request(URL,urllib.parse.urlencode(data).encode('utf-8'))
+            req = urllib.request.Request(URL, urllib.parse.urlencode(data).encode('utf-8'))
         x = xml.dom.minidom.parse(urllib2.urlopen(req))
         status = x.getElementsByTagName("status")[0]
         if status and status.firstChild.data=="SUCCESS":
@@ -93,19 +93,19 @@ def downloadTorrentFiles():
     global time_start
     print("Downloading")
     torrent_list = getURLX(API_URL + "/torrents/list.csp",{"api_key":api_key})
-    if (torrent_list):
+    if torrent_list:
         for hash in torrent_list.getElementsByTagName("info_hash"):
             info_hash = hash.firstChild.data
             torrent_info = getURLX(API_URL + "/torrent/information.csp", {"api_key":api_key,"info_hash":info_hash})
-            if (torrent_info):
+            if torrent_info:
                 torrent_data = torrent_info.getElementsByTagName("data")[0]
                 if float(getFirstData(torrent_data,"percentage_as_decimal")) > 99.99:
                     torrent_name = urllib.parse.unquote(getFirstData(torrent_data,"name"))
                     torrent_label = urllib.parse.unquote(getFirstData(torrent_data,"label"))
                     torrent_status = getFirstData(torrent_data,"status")
                     torrent_links = getURLX(API_URL + "/torrent/links/list.csp",{"api_key":api_key,"info_hash":info_hash})
-                    if (torrent_links):
-                        if (int(getFirstData(torrent_links,"total_links"))>0):
+                    if torrent_links:
+                        if int(getFirstData(torrent_links, "total_links")) > 0:
                             temp_path = os.path.join(download_temp,torrent_name)
                             if not os.path.exists(temp_path):
                                 os.makedirs(temp_path)
@@ -122,13 +122,13 @@ def downloadTorrentFiles():
                                       call([aria_executable,'-x5','-c','-d',temp_path,'-o',filename,url])
                                     else:
                                       time_start=time.time()
-                                      urlretrieve(url,os.path.join(temp_path,filename),urlProgress)
+                                      urllib.urlretrieve(url,os.path.join(temp_path,filename),urlProgress)
                                 if getURLX(API_URL + "/torrent/links/delete.csp",{"api_key":api_key,"info_hash":info_hash}):
                                     print("Deleted Links for "+torrent_name)
                                 if torrent_label:
                                     download_path = download_dir.replace("[label]",torrent_label)
                                 else:
-                                    download_path  = download_dir.replace("[label]"+os.path.sep,"")
+                                    download_path = download_dir.replace("[label]"+os.path.sep,"")
                                 if not os.path.exists(download_path):
                                     os.makedirs(download_path)
                                 if os.path.isdir(download_path):
@@ -146,14 +146,14 @@ def downloadTorrentFiles():
 def cleanUpTorrents():
     print("Cleaning Up")
     torrent_list = getURLX(API_URL + "/torrents/list.csp",{"api_key":api_key})
-    if (torrent_list):
+    if torrent_list:
         for hash in torrent_list.getElementsByTagName("info_hash"):
             info_hash = hash.firstChild.data
             torrent_info = getURLX(API_URL + "/torrent/information.csp", {"api_key":api_key,"info_hash":info_hash})
-            if (torrent_info.getElementsByTagName("status")[0].firstChild.data == "SUCCESS"):
+            if torrent_info.getElementsByTagName("status")[0].firstChild.data == "SUCCESS":
                 if float(torrent_info.getElementsByTagName("percentage_as_decimal")[0].firstChild.data) > 99.99:
                     torrent_data = torrent_info.getElementsByTagName("data")[0]
-                    if (getFirstData(torrent_data,"status") == "stopped"):
+                    if getFirstData(torrent_data,"status") == "stopped":
                         getURLX(API_URL + "/torrent/delete.csp",{"api_key":api_key,"info_hash":info_hash})
 
 # Upload torrents from monitored directory to justseed.it, subfolder name will be the label.
@@ -174,6 +174,7 @@ def uploadTorrents():
             uploadTorrent(file_path)
             os.rename(file_path,os.path.join(torrent_dir,file.replace(".torrent",".torrent.bak")))
 
+
 def uploadTorrent(file_path,label=""):
     try:
         f = open(file_path,'rb')
@@ -193,8 +194,9 @@ def uploadTorrent(file_path,label=""):
             getURLX(API_URL + "/torrent/set_label.csp", {"api_key":api_key,"info_hash":info_hash,"label":label})
         getURLX(API_URL + "/torrent/start.csp", {"api_key":api_key,"info_hash":info_hash})
 
+
 #Load Settings from a Config File
-def loadSettings()
+def loadSettings():
     config = configparser.ConfigParser()
     CONFIG_FILE = os.path.join(os.path.expanduser("~"),".jsit-blackhole")
     if not(os.path.isfile(CONFIG_FILE)):
