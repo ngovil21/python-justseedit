@@ -128,7 +128,10 @@ def downloadTorrentFiles():
                                     if dir and not os.path.exists(dir):
                                         os.makedirs(dir)
                                     #download(url,os.path.join(temp_ath,filename))
-                                    print("Downloading: " + filename)
+                                    try:
+                                        print("Downloading: " + str(filename))
+                                    except Exception as e:
+                                        print(e)
                                     if use_aria:
                                         call([aria_executable, '-x5', '-c', '-d', temp_path, '-o', filename, url])
                                     else:
