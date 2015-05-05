@@ -122,14 +122,14 @@ def downloadTorrentFiles():
                                 os.makedirs(temp_path)
                             if os.path.isdir(temp_path):
                                 for row in torrent_links.getElementsByTagName("row"):
-                                    filename = os.path.normpath(unquote(getFirstData(row, "path")))
+                                    filename = os.path.normpath(unquote(getFirstData(row, "path"))).decode('utf-8','ignore')
                                     url = unquote(getFirstData(row, "url"))
                                     dir = os.path.join(temp_path, os.path.dirname(filename))
                                     if dir and not os.path.exists(dir):
                                         os.makedirs(dir)
                                     #download(url,os.path.join(temp_ath,filename))
                                     try:
-                                        print("Downloading: " + str(filename))
+                                        print("Downloading: " + filename)
                                     except Exception as e:
                                         print(e)
                                     if use_aria:
@@ -137,6 +137,7 @@ def downloadTorrentFiles():
                                     else:
                                         time_start = time.time()
                                         urllib.urlretrieve(url, os.path.join(temp_path, filename), urlProgress)
+                                    print("")
                                 if getURLX(API_URL + "/torrent/links/delete.csp",
                                            {"api_key": api_key, "info_hash": info_hash}):
                                     print("Deleted Links for " + torrent_name)
