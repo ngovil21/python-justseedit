@@ -1,4 +1,4 @@
-#!/bin/python3
+#!/bin/python
 
 #####################################################################################################
 # jsit-blackhole is a script that will act as a blackhole torrent downloader for apps like Sonarr, Couchpotato and SickRage
