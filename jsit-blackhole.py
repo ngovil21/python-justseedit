@@ -1,4 +1,4 @@
-#!/bin/python
+#!/usr/bin/python
 
 #####################################################################################################
 # jsit-blackhole is a script that will act as a blackhole torrent downloader for apps like Sonarr, Couchpotato and SickRage
@@ -91,6 +91,11 @@ def urlProgress(blocks, blockSize, totalSize):
     # except:
     return
 
+def unquote(url):
+    if sys.version < '3':
+        return urllib.unquote(url)
+    else:
+        return urllib.parse.unquote(url)
 
 time_start = 0
 #Download Completed Torrents from justseed.it
@@ -105,8 +110,8 @@ def downloadTorrentFiles():
             if torrent_info:
                 torrent_data = torrent_info.getElementsByTagName("data")[0]
                 if float(getFirstData(torrent_data, "percentage_as_decimal")) > 99.99:
-                    torrent_name = urllib.parse.unquote(getFirstData(torrent_data, "name"))
-                    torrent_label = urllib.parse.unquote(getFirstData(torrent_data, "label"))
+                    torrent_name = unquote(getFirstData(torrent_data, "name"))
+                    torrent_label = unquote(getFirstData(torrent_data, "label"))
                     torrent_status = getFirstData(torrent_data, "status")
                     torrent_links = getURLX(API_URL + "/torrent/links/list.csp",
                                             {"api_key": api_key, "info_hash": info_hash})
@@ -117,8 +122,8 @@ def downloadTorrentFiles():
                                 os.makedirs(temp_path)
                             if os.path.isdir(temp_path):
                                 for row in torrent_links.getElementsByTagName("row"):
-                                    filename = os.path.normpath(urllib.parse.unquote(getFirstData(row, "path")))
-                                    url = urllib.parse.unquote(getFirstData(row, "url"))
+                                    filename = os.path.normpath(unquote(getFirstData(row, "path")))
+                                    url = unquote(getFirstData(row, "url"))
                                     dir = os.path.join(temp_path, os.path.dirname(filename))
                                     if dir and not os.path.exists(dir):
                                         os.makedirs(dir)
