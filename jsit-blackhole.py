@@ -122,7 +122,7 @@ def downloadTorrentFiles():
                                 os.makedirs(temp_path)
                             if os.path.isdir(temp_path):
                                 for row in torrent_links.getElementsByTagName("row"):
-                                    filename = os.path.normpath(unquote(getFirstData(row, "path"))).decode('utf-8','ignore')
+                                    filename = os.path.normpath(unquote(getFirstData(row, "path"))).encode('utf-8', 'ignore')
                                     url = unquote(getFirstData(row, "url"))
                                     dir = os.path.join(temp_path, os.path.dirname(filename))
                                     if dir and not os.path.exists(dir):
