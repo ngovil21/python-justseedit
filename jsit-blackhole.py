@@ -227,11 +227,11 @@ def loadSettings():
     global external_script
     global torrent_dir
     global use_aria
-    global aria_executable1
+    global aria_executable
     config = configparser.ConfigParser()
     CONFIG_FILE = os.path.join(os.path.expanduser("~"), ".jsit-blackhole")
     if not (os.path.isfile(CONFIG_FILE)):
-        CONFIG_FILE = "Settings.cfg"
+        CONFIG_FILE = os.path.join(sys.path[0] + "Settings.cfg")
     if not (os.path.isfile(CONFIG_FILE)):
         #Create Config file here
         print("No config file found! Creating one")

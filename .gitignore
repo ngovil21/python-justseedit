@@ -54,6 +54,10 @@ docs/_build/
 # PyBuilder
 target/
 
+#Ignore .idea
+.idea/
+
+
 # =========================
 # Operating System Files
 # =========================
