@@ -65,10 +65,14 @@ def getURLX(URL, data, retries=3, wait_time=1):
             req = urllib2.Request(URL, urllib.urlencode(data).encode('utf-8'))
         else:
             req = urllib.request.Request(URL, urllib.parse.urlencode(data).encode('utf-8'))
-        x = xml.dom.minidom.parse(urllib2.urlopen(req))
-        status = x.getElementsByTagName("status")[0]
-        if status and status.firstChild.data == "SUCCESS":
-            return x
+        try:
+            page = urllib2.urlopen(req)
+            x = xml.dom.minidom.parse(page)
+            status = x.getElementsByTagName("status")[0]
+            if status and status.firstChild.data == "SUCCESS":
+                return x
+        except Exception as e:
+            print(e)
         print("Failed to load URL")
         time.sleep(wait_time)
     return None
