@@ -11,17 +11,17 @@
 # API key assigned by justseed.it
 api_key = ""
 
-#download directory to store completed download, [label] will be replaced with the label from justseed.it
+# download directory to store completed download, [label] will be replaced with the label from justseed.it
 download_dir = "downloads"
-#directory to store incomplete downloads in
+# directory to store incomplete downloads in
 download_temp = "temp"
-#directory which will be monitored for, subfolders will specify the torrent label
+# directory which will be monitored for, subfolders will specify the torrent label
 torrent_dir = "torrents"
 
 # Clear complete and stopped torrents from justseed.it?
 delete_stopped_and_complete = True
 
-#Runs an external script on the file after download with the download path to the file
+# Runs an external script on the file after download with the download path to the file
 external_script = ""
 
 use_aria = True
@@ -52,13 +52,14 @@ try:
 except:
     import configparser
 
-#linux touch file to update edit time
+
+# linux touch file to update edit time
 def touch(fname, times=None):
     with open(fname, 'a'):
         os.utime(fname, times)
 
 
-#Opens a url and parses XML. Will retry with sleeps in between
+# Opens a url and parses XML. Will retry with sleeps in between
 def getURLX(URL, data, retries=3, wait_time=1):
     for i in range(0, retries):
         if sys.version < '3':
@@ -78,15 +79,15 @@ def getURLX(URL, data, retries=3, wait_time=1):
     return None
 
 
-#Gets the first element of the first tag that matches
+# Gets the first element of the first tag that matches
 def getFirstData(xml, tag):
-    element = xml.getElementsByTagName(tag)[0]
-    if element and element.hasChildNodes():
-        return element.firstChild.data
+    element = xml.getElementsByTagName(tag)
+    if element and element[0].hasChildNodes():
+        return element[0].firstChild.data
     return ""
 
 
-#Not used, showed download progress
+# Not used, showed download progress
 def urlProgress(blocks, blockSize, totalSize):
     # try:
     #   if sys.version() < '3':
@@ -96,14 +97,18 @@ def urlProgress(blocks, blockSize, totalSize):
     # except:
     return
 
+
 def unquote(url):
     if sys.version < '3':
         return urllib.unquote(url)
     else:
         return urllib.parse.unquote(url)
 
+
 time_start = 0
-#Download Completed Torrents from justseed.it
+
+
+# Download Completed Torrents from justseed.it
 def downloadTorrentFiles():
     global time_start
     print("Downloading")
@@ -133,7 +138,7 @@ def downloadTorrentFiles():
                                     dir = os.path.join(temp_path, os.path.dirname(filename))
                                     if dir and not os.path.exists(dir):
                                         os.makedirs(dir)
-                                    #download(url,os.path.join(temp_ath,filename))
+                                    # download(url,os.path.join(temp_ath,filename))
                                     try:
                                         print("Downloading: " + filename)
                                     except Exception as e:
@@ -165,7 +170,7 @@ def downloadTorrentFiles():
                                     call(["python", external_script, download_path])
 
 
-#Delete completed and stopped torrents from justseed.it list
+# Delete completed and stopped torrents from justseed.it list
 def cleanUpTorrents():
     print("Cleaning Up")
     torrent_list = getURLX(API_URL + "/torrents/list.csp", {"api_key": api_key})
@@ -174,10 +179,12 @@ def cleanUpTorrents():
             info_hash = hash.firstChild.data
             torrent_info = getURLX(API_URL + "/torrent/information.csp", {"api_key": api_key, "info_hash": info_hash})
             if torrent_info.getElementsByTagName("status")[0].firstChild.data == "SUCCESS":
-                if float(torrent_info.getElementsByTagName("percentage_as_decimal")[0].firstChild.data) > 99.99:
+                if float(getFirstData(torrent_info, "percentage_as_decimal")) > 99.99:
                     torrent_data = torrent_info.getElementsByTagName("data")[0]
                     if getFirstData(torrent_data, "status") == "stopped":
                         getURLX(API_URL + "/torrent/delete.csp", {"api_key": api_key, "info_hash": info_hash})
+                elif False:
+                    pass
 
 
 # Upload torrents from monitored directory to justseed.it, subfolder name will be the label.
@@ -207,7 +214,7 @@ def uploadTorrent(file_path, label=""):
     except IOError:
         print("Could not open file: " + file_path)
         return
-    #Default naming uses the filename, let's use the name of the torrent file instead (might be more accurate)
+    # Default naming uses the filename, let's use the name of the torrent file instead (might be more accurate)
     torrent_name = os.path.splitext(os.path.basename(file_path))[0]
     torrent_add = getURLX(API_URL + "/torrent/add.csp",
                           {"api_key": api_key, "torrent_file": torrent_data, "prevent_auto_start": 1})
@@ -222,7 +229,7 @@ def uploadTorrent(file_path, label=""):
         getURLX(API_URL + "/torrent/start.csp", {"api_key": api_key, "info_hash": info_hash})
 
 
-#Load Settings from a Config File
+# Load Settings from a Config File
 def loadSettings():
     global api_key
     global download_dir
@@ -237,7 +244,7 @@ def loadSettings():
     if not (os.path.isfile(CONFIG_FILE)):
         CONFIG_FILE = os.path.join(sys.path[0] + "Settings.cfg")
     if not (os.path.isfile(CONFIG_FILE)):
-        #Create Config file here
+        # Create Config file here
         print("No config file found! Creating one")
         config.add_section('Config')
         config.set('Config', 'api_key', "")
@@ -270,10 +277,11 @@ def loadSettings():
         aria_executable = config.get('Config', 'aria_executable')
         if not aria_executable: aria_executable = "aria2c"
 
+
 ## Main Script #####################################################################################
 
 loadSettings()
-#Create temp and torrent directory
+# Create temp and torrent directory
 if not (os.path.isdir(download_temp)):
     os.makedirs(download_temp)
 if not (os.path.isdir(torrent_dir)):
