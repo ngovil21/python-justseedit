@@ -118,6 +118,9 @@ def downloadTorrentFiles():
             info_hash = hash.firstChild.data
             torrent_info = getURLX(API_URL + "/torrent/information.csp", {"api_key": api_key, "info_hash": info_hash})
             if torrent_info:
+                download_files = getFirstData(torrent_info,"auto_download_pieces")
+                if download_files == "No":
+                    continue                # Use auto_download_pieces to flag files to autodownload
                 torrent_data = torrent_info.getElementsByTagName("data")[0]
                 if float(getFirstData(torrent_data, "percentage_as_decimal")) > 99.99:
                     torrent_name = unquote(getFirstData(torrent_data, "name"))
@@ -152,6 +155,7 @@ def downloadTorrentFiles():
                                 if getURLX(API_URL + "/torrent/links/delete.csp",
                                            {"api_key": api_key, "info_hash": info_hash}):
                                     print("Deleted Links for " + torrent_name)
+                                getURLX(API_URL + "/torrent/set_auto_download_pieces.csp", {"api_key": api_key, "info_hash": info_hash, "enable": False})
                                 if torrent_label:
                                     download_path = download_dir.replace("[label]", torrent_label)
                                 else:
@@ -223,6 +227,7 @@ def uploadTorrent(file_path, label=""):
         info_hash = torrent_add.getElementsByTagName("info_hash")[0].firstChild.data
         getURLX(API_URL + "/torrent/set_auto_generate_links.csp",
                 {"api_key": api_key, "info_hash": info_hash, "enable": True})
+        getURLX(API_URL + "/torrent/set_auto_download_pieces.csp", {"api_key": api_key, "info_hash": info_hash, "enable": True})
         getURLX(API_URL + "/torrent/set_name.csp", {"api_key": api_key, "info_hash": info_hash, "name": torrent_name})
         if label:
             getURLX(API_URL + "/torrent/set_label.csp", {"api_key": api_key, "info_hash": info_hash, "label": label})
@@ -242,7 +247,7 @@ def loadSettings():
     config = configparser.ConfigParser()
     CONFIG_FILE = os.path.join(os.path.expanduser("~"), ".jsit-blackhole")
     if not (os.path.isfile(CONFIG_FILE)):
-        CONFIG_FILE = os.path.join(sys.path[0] + "Settings.cfg")
+        CONFIG_FILE = os.path.join(sys.path[0], "Settings.cfg")
     if not (os.path.isfile(CONFIG_FILE)):
         # Create Config file here
         print("No config file found! Creating one")
