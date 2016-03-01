@@ -26,6 +26,7 @@ external_script = ""
 
 use_aria = True
 aria_executable = "aria2c"
+aria_connections = 4
 
 ## END OPTIONS ###################################################################
 
@@ -147,7 +148,8 @@ def downloadTorrentFiles():
                                     except Exception as e:
                                         print(e)
                                     if use_aria:
-                                        call([aria_executable, '-x5', '-c', '-d', temp_path, '-o', filename, url])
+                                        call([aria_executable, '-x', aria_connections, '-s', aria_connections, '-c', '-d', temp_path, '-o', filename,
+                                              url])
                                     else:
                                         time_start = time.time()
                                         urllib.urlretrieve(url, os.path.join(temp_path, filename), urlProgress)
@@ -179,16 +181,14 @@ def cleanUpTorrents():
     print("Cleaning Up")
     torrent_list = getURLX(API_URL + "/torrents/list.csp", {"api_key": api_key})
     if torrent_list:
-        for hash in torrent_list.getElementsByTagName("info_hash"):
-            info_hash = hash.firstChild.data
+        for t_hash in torrent_list.getElementsByTagName("info_hash"):
+            info_hash = t_hash.firstChild.data
             torrent_info = getURLX(API_URL + "/torrent/information.csp", {"api_key": api_key, "info_hash": info_hash})
             if torrent_info.getElementsByTagName("status")[0].firstChild.data == "SUCCESS":
                 if float(getFirstData(torrent_info, "percentage_as_decimal")) > 99.99:
                     torrent_data = torrent_info.getElementsByTagName("data")[0]
                     if getFirstData(torrent_data, "status") == "stopped":
                         getURLX(API_URL + "/torrent/delete.csp", {"api_key": api_key, "info_hash": info_hash})
-                elif False:
-                    pass
 
 
 # Upload torrents from monitored directory to justseed.it, subfolder name will be the label.
@@ -244,6 +244,7 @@ def loadSettings():
     global torrent_dir
     global use_aria
     global aria_executable
+    global aria_connections
     config = configparser.ConfigParser()
     CONFIG_FILE = os.path.join(os.path.expanduser("~"), ".jsit-blackhole")
     if not (os.path.isfile(CONFIG_FILE)):
@@ -260,6 +261,7 @@ def loadSettings():
         config.set('Config', 'external_script', "")
         config.set('Config', 'use_aria', "False")
         config.set('Config', 'aria_executable', "aria2c")
+        config.set('Config', 'aria_connections', "4")
         with open(CONFIG_FILE, 'w') as configfile:
             config.write(configfile)
         exit()
@@ -280,7 +282,11 @@ def loadSettings():
         external_script = config.get('Config', 'external_script')
         use_aria = config.getboolean('Config', 'use_aria')
         aria_executable = config.get('Config', 'aria_executable')
-        if not aria_executable: aria_executable = "aria2c"
+        if not aria_executable:
+            aria_executable = "aria2c"
+        aria_connections = config.get('Config', 'aria_connections')
+        if not aria_connections:
+            aria_connections = 4
 
 
 ## Main Script #####################################################################################

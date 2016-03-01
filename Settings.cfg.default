@@ -7,3 +7,4 @@ delete_stopped_and_complete = False
 external_script = 
 use_aria = False
 aria_executable = aria2c
+aria_connections = 4
